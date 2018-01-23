@@ -90,7 +90,7 @@ namespace SharpShedule
 
         public StateSheduleItem<T> Shedule<T>(StateSheduleItem<T> item)
         {
-            Shedule(item);
+            Shedule((SheduleItem)item);
             return item;
         }
 
