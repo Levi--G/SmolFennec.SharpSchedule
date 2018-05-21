@@ -21,6 +21,7 @@ namespace SharpShedule
             Stop();
             Stopping = false;
             Waiter = new Thread(Wait);
+            Waiter.Start();
         }
 
         void Wait()
@@ -58,7 +59,10 @@ namespace SharpShedule
         public void Stop()
         {
             Stopping = true;
-            Waiter.Join();
+            if (Waiter != null && Waiter.IsAlive)
+            {
+                Waiter.Join();
+            }
             Waiter = null;
         }
 
