@@ -6,20 +6,18 @@ using System.Threading.Tasks;
 
 namespace SharpShedule
 {
-    public class Sheduler : SheduleBase
+    public class AsyncSheduler : SheduleBase
     {
-        private Thread Waiter;
         private bool Stopping = true;
+        public bool RunAsync { get; set; } = false;
 
-        public void Start()
+        public Task Start()
         {
-            Stop();
             Stopping = false;
-            Waiter = new Thread(Wait);
-            Waiter.Start();
+            return Wait();
         }
 
-        private void Wait()
+        private async Task Wait()
         {
             while (!Stopping)
             {
@@ -30,7 +28,21 @@ namespace SharpShedule
                 }
                 if (SI.NextRun < DateTime.Now.AddMilliseconds(Precision))
                 {
-                    Task.Factory.StartNew(() => { try { SI.ToRun(); } catch (Exception e) { DoOnError(e); } });
+                    if (RunAsync)
+                    {
+                        Task.Factory.StartNew(() => { try { SI.ToRun(); } catch (Exception e) { DoOnError(e); } });
+                    }
+                    else
+                    {
+                        try
+                        {
+                            SI.ToRun();
+                        }
+                        catch (Exception e)
+                        {
+                            DoOnError(e);
+                        }
+                    }
                     lock (SheduleKey)
                     {
                         if (SI.Interval.HasValue)
@@ -46,7 +58,7 @@ namespace SharpShedule
                 }
                 else
                 {
-                    Thread.Sleep(Precision);
+                    await Task.Delay(Precision);
                 }
             }
         }
@@ -54,11 +66,6 @@ namespace SharpShedule
         public void Stop()
         {
             Stopping = true;
-            if (Waiter != null && Waiter.IsAlive)
-            {
-                Waiter.Join();
-            }
-            Waiter = null;
         }
     }
 }

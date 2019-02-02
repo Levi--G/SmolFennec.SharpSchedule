@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SharpShedule
 {
@@ -24,7 +22,7 @@ namespace SharpShedule
     {
         public T State { get; set; }
 
-        public StateSheduleItem(Action<T> ToRun, DateTime Start, T State, TimeSpan? Interval = null) : base(()=> { ToRun(State); }, Start, Interval)
+        public StateSheduleItem(Action<T> ToRun, DateTime Start, T State, TimeSpan? Interval = null) : base(() => { ToRun(State); }, Start, Interval)
         {
             this.State = State;
         }
