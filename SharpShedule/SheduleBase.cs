@@ -1,20 +1,98 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SharpShedule
 {
     public class SheduleBase
     {
         public event EventHandler<Exception> OnError;
+
         protected List<SheduleItem> SheduleItems = new List<SheduleItem>();
         protected readonly object SheduleKey = new object();
 
         public int Precision { get; set; } = 100;
+        public SynchronizationContext SynchronizationContext { get; set; }
+        public bool RunAsync { get; set; } = false;
 
         protected void DoOnError(Exception e)
         {
             OnError?.Invoke(this, e);
+        }
+
+        protected bool DoSingleCheck()
+        {
+            var item = GetNextItem();
+            if (item != null && item.NextRun < DateTime.Now.AddMilliseconds(Precision))
+            {
+                RunItem(item);
+                return true;
+            }
+            return false;
+        }
+
+        protected void RunItem(SheduleItem item)
+        {
+            if (SynchronizationContext != null)
+            {
+                if (RunAsync)
+                {
+                    SynchronizationContext.Post((s) => { RunItemSync(item); }, null);
+                }
+                else
+                {
+                    SynchronizationContext.Send((s) => { RunItemSync(item); }, null);
+                }
+            }
+            else if (RunAsync)
+            {
+                RunItemAsync(item);
+            }
+            else
+            {
+                RunItemSync(item);
+            }
+            lock (SheduleKey)
+            {
+                if (item.Interval.HasValue)
+                {
+                    item.NextRun += item.Interval.Value;
+                    ReloadShedule();
+                }
+                else
+                {
+                    SheduleItems.Remove(item);
+                }
+            }
+        }
+
+        private void RunItemAsync(SheduleItem item)
+        {
+            Task.Factory.StartNew(() => { RunItemSync(item); });
+        }
+
+        private void RunItemSync(SheduleItem item)
+        {
+            try
+            {
+                item.ToRun();
+            }
+            catch (Exception e)
+            {
+                DoOnError(e);
+            }
+        }
+
+        protected SheduleItem GetNextItem()
+        {
+            SheduleItem i;
+            lock (SheduleKey)
+            {
+                i = SheduleItems.FirstOrDefault();
+            }
+            return i;
         }
 
         public SheduleItem Shedule(Action ToRun, DateTime Start, TimeSpan? Interval = null)

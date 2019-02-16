@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 
 namespace SharpShedule
 {
@@ -23,28 +19,7 @@ namespace SharpShedule
         {
             while (!Stopping)
             {
-                SheduleItem SI;
-                lock (SheduleKey)
-                {
-                    SI = SheduleItems.First();
-                }
-                if (SI.NextRun < DateTime.Now.AddMilliseconds(Precision))
-                {
-                    Task.Factory.StartNew(() => { try { SI.ToRun(); } catch (Exception e) { DoOnError(e); } });
-                    lock (SheduleKey)
-                    {
-                        if (SI.Interval.HasValue)
-                        {
-                            SI.NextRun += SI.Interval.Value;
-                            ReloadShedule();
-                        }
-                        else
-                        {
-                            SheduleItems.Remove(SI);
-                        }
-                    }
-                }
-                else
+                if (!DoSingleCheck())
                 {
                     Thread.Sleep(Precision);
                 }
