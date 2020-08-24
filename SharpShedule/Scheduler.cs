@@ -1,15 +1,15 @@
 ﻿using System.Threading;
 
-namespace SharpShedule
+namespace SharpSchedule
 {
-    public class Sheduler : SheduleBase
+    public class Scheduler : ScheduleBase
     {
         private Thread Waiter;
         private bool Stopping = true;
 
         public void Start()
         {
-            Stop();
+            StopAndBlock();
             Stopping = false;
             Waiter = new Thread(Wait);
             Waiter.Start();
@@ -27,6 +27,11 @@ namespace SharpShedule
         }
 
         public void Stop()
+        {
+            Stopping = true;
+        }
+
+        public void StopAndBlock()
         {
             Stopping = true;
             if (Waiter != null && Waiter.IsAlive)

@@ -1,9 +1,9 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace SharpShedule
+namespace SharpSchedule
 {
-    public class AsyncSheduler : SheduleBase
+    public class AsyncScheduler : ScheduleBase
     {
         private bool Stopping = true;
 
