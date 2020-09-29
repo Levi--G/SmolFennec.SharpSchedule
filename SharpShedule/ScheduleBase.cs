@@ -308,7 +308,7 @@ namespace SharpSchedule
         {
             if (skip)
             {
-                return last.AddMilliseconds(((DateTime.Now - last).TotalMilliseconds / interval.TotalMilliseconds + 1) * interval.TotalMilliseconds);
+                return last.AddMilliseconds((Math.Floor((DateTime.Now - last).TotalMilliseconds / interval.TotalMilliseconds) + 1) * interval.TotalMilliseconds);
             }
             else
             {
