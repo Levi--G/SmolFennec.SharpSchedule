@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace SharpSchedule
 {
-    class SchedulerSynchronizationContext : SynchronizationContext
+    public class SchedulerSynchronizationContext : SynchronizationContext
     {
-        Scheduler scheduler;
+        private Scheduler scheduler;
 
         public SchedulerSynchronizationContext(Scheduler scheduler)
         {
