@@ -2,11 +2,28 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3;netstandard2.0</TargetFrameworks>
+    <PackageProjectUrl>https://github.com/Levi--G/SmolFennec.SharpSchedule</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Levi--G/SmolFennec.SharpSchedule.git</RepositoryUrl>
+    <PackageReleaseNotes>Release</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>SharpSchedule is a DateTime scheduler for .NET that allows running code at specific times or intervals.</Description>
+    <Authors>Levi Gillis</Authors>
+    <PackageId>SmolFennec.SharpSchedule</PackageId>
+    <Product>SmolFennec.SharpSchedule</Product>
+    <Copyright>Levi Gillis @ 2020</Copyright>
+    <PackageIcon>SmolFennec.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Threading" Version="4.3.0" />
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\SmolFennec.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
