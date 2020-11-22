@@ -9,6 +9,9 @@ namespace SharpSchedule
     {
         private Thread Waiter;
         private bool Stopping = true;
+        ManualResetEvent NewWorkAvailable = new ManualResetEvent(false);
+
+        public bool InterruptWhenReloading { get; set; } = true;
 
         /// <summary>
         /// Starts a thread to run the scheduler and begins processing jobs.
@@ -43,7 +46,15 @@ namespace SharpSchedule
             {
                 if (!DoSingleCheck())
                 {
-                    Thread.Sleep(Precision);
+                    if (InterruptWhenReloading)
+                    {
+                        NewWorkAvailable.WaitOne(Precision);
+                        NewWorkAvailable.Reset();
+                    }
+                    else
+                    {
+                        Thread.Sleep(Precision);
+                    }
                 }
             }
         }
@@ -67,6 +78,12 @@ namespace SharpSchedule
                 Waiter.Join();
             }
             Waiter = null;
+        }
+
+        protected override void ReloadScheduleInternal()
+        {
+            base.ReloadScheduleInternal();
+            NewWorkAvailable.Set();
         }
     }
 }

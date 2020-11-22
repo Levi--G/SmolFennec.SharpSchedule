@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SharpSchedule
 {
-    public class ScheduleBase
+    public abstract class ScheduleBase
     {
         /// <summary>
         /// Occurs when a job encounters an Error.
@@ -366,7 +366,7 @@ namespace SharpSchedule
             return Schedule(ToRun, DateTime.Now + timeSpan, State);
         }
 
-        private void ReloadScheduleInternal()
+        protected virtual void ReloadScheduleInternal()
         {
             ScheduleItems.Sort((x, y) => { return x.NextRun.CompareTo(y.NextRun); });
         }
