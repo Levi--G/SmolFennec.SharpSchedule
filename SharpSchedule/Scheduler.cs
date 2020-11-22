@@ -11,22 +11,30 @@ namespace SharpSchedule
         private bool Stopping = true;
 
         /// <summary>
-        /// Starts the scheduler and begins processing jobs.
+        /// Starts a thread to run the scheduler and begins processing jobs.
         /// </summary>
 #if NETSTANDARD2_0
-        public void Start(ApartmentState apartmentState = ApartmentState.MTA)
+        public void StartThread(ApartmentState apartmentState = ApartmentState.MTA)
 #else
 
-        public void Start()
+        public void StartThread()
 #endif
         {
-            StopAndBlock();
-            Stopping = false;
-            Waiter = new Thread(Wait);
+            Waiter = new Thread(Start);
 #if NETSTANDARD2_0
             Waiter.SetApartmentState(apartmentState);
 #endif
             Waiter.Start();
+        }
+
+        /// <summary>
+        /// Starts the scheduler on the current thread and begins processing jobs.
+        /// </summary>
+        public void Start()
+        {
+            StopAndBlock();
+            Stopping = false;
+            Wait();
         }
 
         private void Wait()
@@ -43,7 +51,7 @@ namespace SharpSchedule
         /// <summary>
         /// Stops processing new jobs.
         /// </summary>
-        public void Stop()
+        public void SignalStop()
         {
             Stopping = true;
         }

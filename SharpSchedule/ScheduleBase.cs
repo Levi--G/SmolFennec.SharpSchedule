@@ -84,7 +84,7 @@ namespace SharpSchedule
             {
                 if (item.Interval.HasValue)
                 {
-                    item.NextRun = GetNextTime(item.Start, item.Interval.Value, item.CanSkip);
+                    item.NextRun = GetNextTime(item.NextRun, item.Interval.Value, item.CanSkip);
                     ReloadScheduleInternal();
                 }
                 else
@@ -296,7 +296,7 @@ namespace SharpSchedule
         private ScheduleItem PrepareScheduleInternal(ScheduleItem item)
         {
             item.NextRun = item.Start;
-            if (item.Interval.HasValue && item.Start < DateTime.Now)
+            if (item.CanSkip && item.Interval.HasValue && item.Start < DateTime.Now)
             {
                 item.NextRun = GetNextTime(item.Start, item.Interval.Value, item.CanSkip);
             }
