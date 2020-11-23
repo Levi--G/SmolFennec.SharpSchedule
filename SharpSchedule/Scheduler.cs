@@ -23,7 +23,9 @@ namespace SharpSchedule
         public void StartThread()
 #endif
         {
-            Waiter = new Thread(Start);
+            StopAndBlock();
+            Stopping = false;
+            Waiter = new Thread(Wait);
 #if NETSTANDARD2_0
             Waiter.SetApartmentState(apartmentState);
 #endif
@@ -46,15 +48,8 @@ namespace SharpSchedule
             {
                 if (!DoSingleCheck())
                 {
-                    if (InterruptWhenReloading)
-                    {
-                        NewWorkAvailable.WaitOne(Precision);
-                        NewWorkAvailable.Reset();
-                    }
-                    else
-                    {
-                        Thread.Sleep(Precision);
-                    }
+                    NewWorkAvailable.WaitOne(Precision);
+                    NewWorkAvailable.Reset();
                 }
             }
         }
@@ -65,6 +60,7 @@ namespace SharpSchedule
         public void SignalStop()
         {
             Stopping = true;
+            NewWorkAvailable.Set();
         }
 
         /// <summary>
@@ -73,6 +69,7 @@ namespace SharpSchedule
         public void StopAndBlock()
         {
             Stopping = true;
+            NewWorkAvailable.Set();
             if (Waiter != null && Waiter.IsAlive)
             {
                 Waiter.Join();
@@ -83,7 +80,10 @@ namespace SharpSchedule
         protected override void ReloadScheduleInternal()
         {
             base.ReloadScheduleInternal();
-            NewWorkAvailable.Set();
+            if (InterruptWhenReloading)
+            {
+                NewWorkAvailable.Set();
+            }
         }
     }
 }

@@ -372,6 +372,16 @@ namespace SharpSchedule
             ScheduleItems.Sort((x, y) => { return x.NextRun.CompareTo(y.NextRun); });
         }
 
+        public List<ScheduleItem> GetScheduledItems()
+        {
+            List<ScheduleItem> list;
+            lock (ScheduleKey)
+            {
+                list = ScheduleItems.ToList();
+            }
+            return list;
+        }
+
         /// <summary>
         /// Forces a reload of the internal schedule. Should not be used.
         /// </summary>
