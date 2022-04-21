@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace SharpSchedule
 {
@@ -12,6 +13,8 @@ namespace SharpSchedule
         ManualResetEvent NewWorkAvailable = new ManualResetEvent(false);
 
         public bool InterruptWhenReloading { get; set; } = true;
+        public bool UseBetterPrecision { get; set; } = true;
+        public bool IsRunning { get; private set; } = false;
 
         /// <summary>
         /// Starts a thread to run the scheduler and begins processing jobs.
@@ -27,7 +30,7 @@ namespace SharpSchedule
             Stopping = false;
             Waiter = new Thread(Wait);
 #if NETSTANDARD2_0
-            Waiter.SetApartmentState(apartmentState);
+            Waiter.TrySetApartmentState(apartmentState);
 #endif
             Waiter.Start();
         }
@@ -44,13 +47,36 @@ namespace SharpSchedule
 
         private void Wait()
         {
-            while (!Stopping)
+            try
             {
-                if (!DoSingleCheck())
+                IsRunning = true;
+                while (!Stopping)
                 {
-                    NewWorkAvailable.WaitOne(Precision);
-                    NewWorkAvailable.Reset();
+                    if (!DoSingleCheck())
+                    {
+                        var delay = Precision;
+                        if (UseBetterPrecision)
+                        {
+                            var i = GetNextItem();
+                            if (i != null)
+                            {
+                                delay = (int)i.NextRun.Subtract(DateTime.Now).TotalMilliseconds - Precision;
+                                delay = Math.Min(delay, Precision * 128);
+                                delay = Math.Max(delay, Precision / 128);
+                            }
+                            else
+                            {
+                                delay = Precision * 128;
+                            }
+                        }
+                        NewWorkAvailable.WaitOne(delay);
+                        NewWorkAvailable.Reset();
+                    }
                 }
+            }
+            finally
+            {
+                IsRunning = false;
             }
         }
 

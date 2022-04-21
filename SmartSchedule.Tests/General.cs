@@ -40,6 +40,90 @@ namespace SmartSchedule.Tests
         }
 
         /// <summary>
+        /// Without BetterPrecision tasks will be run in multiples of Precision
+        /// </summary>
+        [Fact]
+        public void NoBetterPrecisionExecution()
+        {
+            var s = new Scheduler() { Precision = 2000, UseBetterPrecision = false };
+            s.StartThread();
+            int i = 0;
+            Thread.Sleep(50);
+            s.Schedule(() => i++, DateTime.Now.AddMilliseconds(2100));
+            Thread.Sleep(200);
+            Assert.Equal(0, i);
+            Thread.Sleep(2000);
+            s.StopAndBlock();
+            Assert.Equal(1, i);
+        }
+
+        /// <summary>
+        /// With BetterPrecision tasks will be run as soon as possible
+        /// </summary>
+        [Fact]
+        public void BetterPrecisionExecution()
+        {
+            var s = new Scheduler() { Precision = 2000 };
+            s.StartThread();
+            int i = 0;
+            Thread.Sleep(50);
+            s.Schedule(() => i++, DateTime.Now.AddMilliseconds(2100));
+            Thread.Sleep(200);
+            Assert.Equal(1, i);
+            Thread.Sleep(2000);
+            s.StopAndBlock();
+            Assert.Equal(1, i);
+        }
+
+        /// <summary>
+        /// With BetterPrecision there will be less spinning
+        /// </summary>
+        [Fact]
+        public void BetterPrecisionLongerPolling()
+        {
+            var s = new Scheduler() { Precision = 50, InterruptWhenReloading = false, UseBetterPrecision = true };
+            s.StartThread();
+            int i = 0;
+            Thread.Sleep(50);
+            s.Schedule(() => i++, DateTime.Now);
+            Thread.Sleep(200);
+            s.StopAndBlock();
+            Assert.Equal(0, i);
+        }
+
+        /// <summary>
+        /// Without BetterPrecision there will be more spinning
+        /// </summary>
+        [Fact]
+        public void NoBetterPrecisionLongerPolling()
+        {
+            var s = new Scheduler() { Precision = 50, InterruptWhenReloading = false, UseBetterPrecision = false };
+            s.StartThread();
+            int i = 0;
+            Thread.Sleep(50);
+            s.Schedule(() => i++, DateTime.Now);
+            Thread.Sleep(200);
+            s.StopAndBlock();
+            Assert.Equal(1, i);
+        }
+
+        /// <summary>
+        /// Rest IsRunning property
+        /// </summary>
+        [Fact]
+        public void IsRunning()
+        {
+            var s = new Scheduler() { Precision = 2000 };
+            Assert.False(s.IsRunning);
+            s.StartThread();
+            Thread.Sleep(50);
+            Assert.True(s.IsRunning);
+            s.StopAndBlock();
+            Thread.Sleep(50);
+            Assert.False(s.IsRunning);
+        }
+
+        /// <summary>
         /// Should run the exact amount of times
         /// </summary>
         [Fact]

@@ -1,19 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.3;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3;netstandard2.0;net6</TargetFrameworks>
     <PackageProjectUrl>https://github.com/Levi--G/SmolFennec.SharpSchedule</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Levi--G/SmolFennec.SharpSchedule.git</RepositoryUrl>
-    <PackageReleaseNotes>Critical Bugfixes
-Added fast interrupt/exit for threaded scheduler</PackageReleaseNotes>
+    <PackageReleaseNotes>Added better spinning option (UseBetterPrecision) to Threaded scheduler</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>SharpSchedule is a DateTime scheduler for .NET that allows running code at specific times or intervals.</Description>
     <Authors>Levi Gillis</Authors>
     <PackageId>SmolFennec.SharpSchedule</PackageId>
     <Product>SmolFennec.SharpSchedule</Product>
-    <Copyright>Levi Gillis @ 2020</Copyright>
+    <Copyright>Levi Gillis @ 2020-2022</Copyright>
     <PackageIcon>SmolFennec.png</PackageIcon>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
