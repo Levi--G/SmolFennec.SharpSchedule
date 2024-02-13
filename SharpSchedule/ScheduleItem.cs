@@ -14,12 +14,12 @@ namespace SharpSchedule
         /// <summary>
         /// An action to be run.
         /// </summary>
-        public Action ToRun { get; }
+        public Action? ToRun { get; }
 
         /// <summary>
         /// A function returning a task to be run.
         /// </summary>
-        public Func<Task> ToRunAsync { get; }
+        public Func<Task>? ToRunAsync { get; }
 
         /// <summary>
         /// The first time this item should run.
@@ -57,7 +57,7 @@ namespace SharpSchedule
         /// <summary>
         /// When set will run the job synchronised on this context.
         /// </summary>
-        public SynchronizationContext SynchronizationContext { get; set; }
+        public SynchronizationContext? SynchronizationContext { get; set; }
 
         /// <summary>
         /// Sets the job to run asynchronous from the scheduler.

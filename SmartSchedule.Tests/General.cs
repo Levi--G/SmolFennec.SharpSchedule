@@ -241,5 +241,45 @@ namespace SmartSchedule.Tests
             Assert.Equal(syti, cti);
             Assert.NotEqual(i, syti);
         }
+
+        /// <summary>
+        /// Should run the exactly once
+        /// </summary>
+        [Fact]
+        public void SlimRunOnce()
+        {
+            var s = new SchedulerSlim();
+            int i = 0;
+            s.ScheduleOnce(() => i++);
+            s.StartThread();
+            Thread.Sleep(50);
+            Assert.Equal(1, i);
+            s.ScheduleOnce(() => i++);
+            Thread.Sleep(50);
+            s.StopAndBlock();
+            Assert.Equal(2, i);
+        }
+
+        /// <summary>
+        /// Should run the exactly once
+        /// </summary>
+        [Fact]
+        public void SlimRunLoop()
+        {
+            var s = new SchedulerSlim();
+            int i = 0;
+            Action a = () => i++;
+            s.ScheduleLoop(a);
+            s.StartThread();
+            Thread.Sleep(50);
+            Assert.True(i > 0);
+            s.StopAndBlock();
+            s.UnscheduleLoop(a);
+            var temp = i;
+            s.StartThread();
+            Thread.Sleep(50);
+            s.StopAndBlock();
+            Assert.Equal(temp, i);
+        }
     }
 }

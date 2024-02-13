@@ -17,12 +17,12 @@ namespace SharpSchedule
             return new SchedulerSynchronizationContext(scheduler);
         }
 
-        public override void Post(SendOrPostCallback d, object state)
+        public override void Post(SendOrPostCallback d, object? state)
         {
             scheduler.Schedule(() => d(state), DateTime.Now);
         }
 
-        public override void Send(SendOrPostCallback d, object state)
+        public override void Send(SendOrPostCallback d, object? state)
         {
             using (var s = new SemaphoreSlim(0))
             {

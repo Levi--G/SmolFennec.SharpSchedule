@@ -1,18 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.3;netstandard2.0;net6</TargetFrameworks>
+    <TargetFrameworks>net48;netstandard2.0;netstandard2.1;net6;net8</TargetFrameworks>
     <PackageProjectUrl>https://github.com/Levi--G/SmolFennec.SharpSchedule</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Levi--G/SmolFennec.SharpSchedule.git</RepositoryUrl>
-    <PackageReleaseNotes>Added better spinning option (UseBetterPrecision) to Threaded scheduler</PackageReleaseNotes>
+    <PackageReleaseNotes>Added SchedulerSlim to support light busy spinning loops with synchronising high prio tasks</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>SharpSchedule is a DateTime scheduler for .NET that allows running code at specific times or intervals.</Description>
     <Authors>Levi Gillis</Authors>
     <PackageId>SmolFennec.SharpSchedule</PackageId>
     <Product>SmolFennec.SharpSchedule</Product>
-    <Copyright>Levi Gillis @ 2020-2022</Copyright>
+    <Copyright>Levi Gillis @ 2020-2024</Copyright>
     <PackageIcon>SmolFennec.png</PackageIcon>
-    <Version>1.2.0</Version>
+    <Version>1.3.0</Version>
+    <Nullable>enable</Nullable>
+    <Title>SmolFennec.SharpSchedule</Title>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,10 +32,26 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\SmolFennec.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6'">
+    <PackageReference Include="DotNext.Threading">
+      <Version>4.15.2</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8'">
+    <PackageReference Include="DotNext.Threading">
+      <Version>4.15.2</Version>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

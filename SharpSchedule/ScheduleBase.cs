@@ -11,12 +11,12 @@ namespace SharpSchedule
         /// <summary>
         /// Occurs when a job encounters an Error.
         /// </summary>
-        public event EventHandler<Exception> OnError;
+        public event EventHandler<Exception>? OnError;
 
         /// <summary>
         /// Occurs when the scheduler missed the execution of a job outside the minimum precision specified.
         /// </summary>
-        public event EventHandler<TimeSpan> OnRunningBehind;
+        public event EventHandler<TimeSpan>? OnRunningBehind;
 
         protected List<ScheduleItem> ScheduleItems = new List<ScheduleItem>();
         protected readonly object ScheduleKey = new object();
@@ -157,9 +157,9 @@ namespace SharpSchedule
             }
         }
 
-        protected ScheduleItem GetNextItem()
+        protected ScheduleItem? GetNextItem()
         {
-            ScheduleItem i;
+            ScheduleItem? i;
             lock (ScheduleKey)
             {
                 i = ScheduleItems.FirstOrDefault();

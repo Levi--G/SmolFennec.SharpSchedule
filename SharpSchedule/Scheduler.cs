@@ -8,7 +8,7 @@ namespace SharpSchedule
     /// </summary>
     public class Scheduler : ScheduleBase
     {
-        private Thread Waiter;
+        private Thread? Waiter;
         private bool Stopping = true;
         ManualResetEvent NewWorkAvailable = new ManualResetEvent(false);
 
@@ -19,19 +19,12 @@ namespace SharpSchedule
         /// <summary>
         /// Starts a thread to run the scheduler and begins processing jobs.
         /// </summary>
-#if NETSTANDARD2_0
         public void StartThread(ApartmentState apartmentState = ApartmentState.MTA)
-#else
-
-        public void StartThread()
-#endif
         {
             StopAndBlock();
             Stopping = false;
             Waiter = new Thread(Wait);
-#if NETSTANDARD2_0
             Waiter.TrySetApartmentState(apartmentState);
-#endif
             Waiter.Start();
         }
 
