@@ -9,7 +9,8 @@
 ## Support
 
 Supported platforms: 
-- .Net Standard 1.3+ (limited features)
+- .Net 6.0+, 8.0+
+- .Net Framework 4.8+
 - .Net Standard 2.0+
 
 When in trouble:
@@ -17,9 +18,10 @@ When in trouble:
 
 ## Usage
 
-There are currently 2 types:
+There are currently 3 types:
 - Scheduler: The original synchronous scheduler using threads.
 - AsyncScheduler: A scheduler based on async delays
+- SchedulerSlim: A very lightweight spinner/synchroniser for high load scenarios
 
 There are multiple ways to schedule an execution:
 - `Schedule(Action/Func<Task>, DateTime, (optional)TimeSpan)`: Schedules an Action or Task to run synchronous with the scheduler for a specified time and optionally repeats this every x time. **Recommended for console applications** or when actions should be executed in order.
