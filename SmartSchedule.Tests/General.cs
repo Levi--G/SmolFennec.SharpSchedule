@@ -2,6 +2,9 @@ using System;
 using Xunit;
 using SharpSchedule;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SmartSchedule.Tests
 {
@@ -133,7 +136,7 @@ namespace SmartSchedule.Tests
             int i = 0;
             s.Schedule(new ScheduleItem(() => i++, DateTime.Now, TimeSpan.FromMilliseconds(200)) { CanSkip = false });
             s.StartThread();
-            Thread.Sleep(500);
+            Thread.Sleep(450);
             s.StopAndBlock();
             Assert.Equal(3, i);
         }
@@ -148,7 +151,7 @@ namespace SmartSchedule.Tests
             int i = 0;
             s.Schedule(() => i++, DateTime.Now, TimeSpan.FromMilliseconds(200));
             s.StartThread();
-            Thread.Sleep(500);
+            Thread.Sleep(450);
             s.StopAndBlock();
             Assert.Equal(2, i);
         }
@@ -280,6 +283,54 @@ namespace SmartSchedule.Tests
             Thread.Sleep(50);
             s.StopAndBlock();
             Assert.Equal(temp, i);
+        }
+
+        [Fact]
+        public void SlimSync()
+        {
+            var s = new SchedulerSlim();
+            var ctx = new SchedulerSlimSynchronizationContext(s);
+            s.StartThread();
+
+            var old = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(null);
+
+            async Task<int> GetThreadID()
+            {
+                int i = 0;
+                await Task.Run(() => { i++; Thread.Sleep(1000); });
+                return Thread.CurrentThread.ManagedThreadId + i;
+            }
+
+            Assert.NotEqual(GetThreadID().Result, GetThreadID().Result);
+            SynchronizationContext.SetSynchronizationContext(ctx);
+            Assert.Equal(GetThreadID().Result, GetThreadID().Result);
+            s.StopAndBlock();
+            SynchronizationContext.SetSynchronizationContext(old);
+        }
+
+        [Fact]
+        public void SlimTasks()
+        {
+            var s = new SchedulerSlim(true);
+            s.StartThread();
+            int i = 0;
+            s.ScheduleOnce(() => i++);
+            s.ScheduleOnce(async () => { await Task.Delay(10); i++; });
+            s.RunOnceAsTask(() => i++);
+            s.RunOnceAsTask(async () => { await Task.Delay(10); i++; });
+            Thread.Sleep(50);
+            s.RunOnceAsTask(() => i++);
+            var a = s.RunOnceAsTask(async () => { await Task.Delay(10); i++; return i; });
+            Thread.Sleep(50);
+            var b = s.RunOnceAsTask(() => i);
+            //due to how async works stopandblock does not guarantee tasks completing unless they are synchronous methods
+            s.StopAndBlock(true);
+            Assert.True(a.IsCompleted);
+            Assert.True(b.IsCompleted);
+            Assert.Equal(i, a.Result);
+            Assert.Equal(i, b.Result);
+            Assert.Equal(6, i);
         }
     }
 }
